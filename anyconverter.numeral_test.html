@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+<style>
+html {
+    font-size: 12px;
+} 
+.output table td{
+	word-break:break-all;
+}
+</style>
+<script src="anyconverter.numeral.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+<script type="text/javascript">
+
+$(function(){
+	var ac = new AnyConverter();
+
+	var outputclass = "outputgenerate";
+	var testConvNumeral = function(ptn, num){
+		var $tr = $('<tr class="' + outputclass + '"></tr>');
+		$tr.append($('<td>' + num + '<br>' + ptn + '</td>'));
+		$tr.append($('<td>' + ac.numeral.tokanji(num, {yomi : false, omit1 : true}) + '</td>'));
+		$tr.append($('<td>' + ac.numeral.todaiji(num, {yomi : false, omit1 : false}) + '</td>'));
+		$(".conv_num table tbody").append($tr);
+	};
+	var test = function(ptn, num){
+		$("." + outputclass).remove();
+		testConvNumeral("【正常】", 0);
+		testConvNumeral("【正常】", 1);
+		testConvNumeral("【正常】", 10);
+		testConvNumeral("【正常】", 34567);
+		testConvNumeral("【正常】", "1234567890");
+		testConvNumeral("【正常】", "10203040506070809");
+		testConvNumeral("【正常】", "100020003000400050006000700080009");
+		testConvNumeral("【正常】", "100000002000000030000000400000005000000060000000700000008000000090000");
+		testConvNumeral("【正常】", "100020003000400050006000700080009000100020003000400050006000700080009");
+		testConvNumeral("【正常】", "1000200030004000500060007000800090001000200030004000500060007000800090");
+		testConvNumeral("【正常】", "10002000300040005000600070008000900010002000300040005000600070008000900");
+		testConvNumeral("【正常】", "100020003000400050006000700080009000100020003000400050006000700080009000");
+		testConvNumeral("【正常】", "100000000000000000000000000000000000000000000000000000000000000000000000");
+		testConvNumeral("【正常】", "0.0");
+		testConvNumeral("【正常】", "0000.000000000");
+		testConvNumeral("【正常】", "0.1234567");
+		testConvNumeral("【正常】", "1234.567890123");
+		testConvNumeral("【正常】閾値桁数（大数、少数）",  "123456789012345678901234567890123456789012345678901234567890123456789012.123456789012345678901234");
+		testConvNumeral("【正常】閾値桁数（大数、少数）",  "111111111111111111111111111111111111111111111111111111111111111111111111.111111111111111111111111");
+		testConvNumeral("【正常】閾値桁数（大数、少数）",  "999999999999999999999999999999999999999999999999999999999999999999999999.999999999999999999999999");
+		testConvNumeral("【正常】閾値桁数（大数、少数）",  "100000000000000000000000000000000000000000000000000000000000000000000000.000000000000000000000001");
+		testConvNumeral("【異常】閾値桁数越え（大数）",   "1000000000000000000000000000000000000000000000000000000000000000000000000.000000000000000000000000");
+		testConvNumeral("【異常】閾値桁数越え（大数）",   "1234567890123456789012345678901234567890123456789012345678901234567890123.123456789012345678901234");
+		testConvNumeral("【異常】閾値桁数越え（少数）"  ,  "999999999999999999999999999999999999999999999999999999999999999999999999.9999999999999999999999990");
+		testConvNumeral("【異常】閾値桁数越え（少数）",    "123456789012345678901234567890123456789012345678901234567890123456789012.1234567890123456789012345");
+		testConvNumeral("【異常】空", "");
+		testConvNumeral("【異常】書式", "0.0.0");
+		testConvNumeral("【異常】書式", "1.1.1");
+		testConvNumeral("【異常】書式", ".987654321");
+	}
+	test();
+
+	var conv = function(){
+		var convnum = $(".conv_num input#convnum").val();
+		var $yomi = $(".conv_num input#yomi");
+		var $omit1 = $(".conv_num input#omit1");
+		console.log(convnum);
+		var opt = {};
+		opt.yomi = $yomi.prop("checked");
+		opt.omit1 = $omit1.prop("checked");
+		$(".output_kanji").text(ac.numeral.tokanji(convnum, opt));
+		$(".output_daiji").text(ac.numeral.todaiji(convnum, opt));
+	};
+	$(".conv_num input#convnum").change(function(){
+		conv();
+	});
+	$(".conv_num input#yomi").change(function(){
+		conv();
+	});
+	$(".conv_num input#omit1").change(function(){
+		conv();
+	});
+	$(".conv_num form").submit(function(){
+		return false;
+	});
+});
+
+</script>
+</head>
+<body>
+<section class="output conv_num">
+	<nav class="navbar navbar-dark bg-dark">
+		<a href="#" class="navbar-brand">AnyConverter</a>
+	</nav>
+	<h1 class="page-header">NumeralConverter(AnyConverter.numeral)</h1>
+	<div>
+		参照方法：「anyconverter.numeral.js」を呼び出す。（他ライブラリ不要）<br>
+		<samp>
+			&lt;script src="anyconverter.numeral.js"&gt;&lt;/script&gt;
+		</samp>
+		<p>数値（文字列）を命数法を用いた表記に変換します。オプション（yomi：読み仮名を付与、omit1：１の表記を省略）</p>
+	</div>
+	<table class="table table-striped table-condensed">
+		<thead>
+			<tr>
+				<th style="width:20%;">変換対象</th>
+				<th style="width:40%;">変換後（命数法・漢数字）<br>AnyConverter.numeral.tokanji</th>
+				<th style="width:40%;">変換後（命数法・大字）<br>AnyConverter.numeral.todaiji</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<form>
+						<input type="text" name="number" id="convnum"></input><br>
+						<input type="checkbox" name="_omit1" id="omit1"><label for="omit1">１の表記を省略</label>
+						&nbsp;
+						<input type="checkbox" name="_yomi" id="yomi"><label for="yomi">読み仮名を付与</label>
+					</form>
+				</td>
+				<td class="output_kanji"></td>
+				<td class="output_daiji"></td>
+			</tr>
+		</tbody>
+	</table>
+</section>
+
+<footer>
+	<blockquote>
+		<p>このテストページでは下記ライブラリを参照しています。</p>
+		<ul>
+			<li>https://code.jquery.com/jquery-3.5.0.min.js</li>
+			<li>https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css</li>
+			<li>https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js</li>
+		</ul>
+	</blockquote>
+</footer>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
